@@ -1,0 +1,17 @@
+use_osc "localhost", 4560
+
+live_loop :sensor do
+  use_real_time
+  begin
+    distancia = sync "/osc*/distancia"[0]
+    puts "Distancia recibida: #{distancia}"
+    
+    # Mapeo de distancia (rango de 10 a 80 cm) a notas MIDI (rango 40 a 80)
+    nota_midi = (40 + (80 - distancia)).clamp(40, 80)
+    play nota_midi.round, release: 0.3, amp: 0.8
+    
+  rescue => e
+    puts "Esperando OSC: #{e.message}"
+    sleep 0.1  # evita el error de loop sin pausa
+  end
+end
